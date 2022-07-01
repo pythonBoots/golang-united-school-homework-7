@@ -58,7 +58,6 @@ var (
 	}
 ) 
 var (
-	testMatrixStr string = "1 2 3 4\n 5 6 7 8\n 9 10 11 12\n 13 14 15 16" 
 	testMatrixCorrect = Matrix {
 		rows: 4,
 		cols: 4,
@@ -93,7 +92,7 @@ func TestLength(t *testing.T) {
 }
 
 func TestLess(t *testing.T) {
-	var newPeople People = []Person{person1, person2, person3, person4, person5, person6, person7}
+	newPeople := People{person1, person2, person3, person4, person5, person6, person7}
 	testSet := map[string]testValueLess{
 		"Date is different": {
 			i: 1,
@@ -134,28 +133,36 @@ func TestSwap(t *testing.T) {
 }
 
 func TestMatrixCreation(t *testing.T) {
-	testMatrix, error := New(testMatrixStr)
-	if error != nil {
-		t.Error(error)
-	} else if testMatrix.cols != testMatrixCorrect.cols || testMatrix.rows != testMatrixCorrect.rows {
-		t.Errorf("Columns or rows number is not correct")
-	} else if len(testMatrix.data) != len(testMatrixCorrect.data) {
-		t.Errorf("Result matrix (length %d) has different length than expected (lentgth %d)", len(testMatrix.data), len(testMatrixCorrect.data))
+	var testMatrixStr = map [string]string {
+		"correct matrix": "1 2 3 4\n 5 6 7 8\n 9 10 11 12\n 13 14 15 16",
+		"matrix with letter": "1 2 3 4\n 5 6 7 8\n 9 10 11 12\n 13 14 s 16",
+		"different rows length": "1 2 3 4\n 5 6 7 8\n 9 10 11 12 14\n 13 14 15 16",
+	}
+	for key, tt := range(testMatrixStr) {
+		_, error := New(tt)
+		if error == nil && key == "different rows legth" {
+			t.Errorf("%v is not passed ", key)
+		} else if error == nil && key == "matrix with letter" {
+			t.Errorf("%v is not passed ", key)
+		}
 	}
 	// Check equality of matrices
-	for i := 0; i < len(testMatrix.data); i++ {
-		if testMatrix.data[i] != testMatrixCorrect.data[i] {
-			t.Errorf("Data is not equaled, %d element", i)
+	testMatrixCorrectSize,error := New(testMatrixStr["correct matrix"])
+	if error == nil {
+		for i := 0; i < len(testMatrixCorrectSize.data); i++ {
+			if testMatrixCorrectSize.data[i] != testMatrixCorrect.data[i] {
+				t.Errorf("Data is not equaled, %d element", i)
+			}
 		}
-	}	
-}
-
-func TestRows(t *testing.T) {
-	testMatrix, error := New(testMatrixStr)
-	
-	if error != nil {
-		t.Error(error)
 	}
+}
+func TestRows(t *testing.T) {
+	var testMatrixStr = "1 2 3 4\n 5 6 7 8\n 9 10 11 12\n 13 14 15 16"
+
+	testMatrix, _:= New(testMatrixStr)
+
+	
+	
 	resultRowsTestMatrix := testMatrix.Rows()
 	if len(resultRowsTestMatrix) != len(testRows) {
 		t.Errorf("Size of the matrix is not correct")
@@ -170,6 +177,8 @@ func TestRows(t *testing.T) {
 }
 
 func TestCols(t *testing.T) {
+	var testMatrixStr = "1 2 3 4\n 5 6 7 8\n 9 10 11 12\n 13 14 15 16"
+
 	testMatrix, error := New(testMatrixStr)
 	
 	if error != nil {
@@ -189,19 +198,25 @@ func TestCols(t *testing.T) {
 }
 
 func TestSet(t *testing.T) {
+	var testMatrixStr = "1 2 3 4\n 5 6 7 8\n 9 10 11 12\n 13 14 15 16"
+
 	testMatrix, error := New(testMatrixStr)
 	if error != nil {
 		t.Error(error)
 	}
-	i := 1
-	j := 0
+	i1 := 1
+	j1 := 0
+	i2 := 4
+	j2 := 3
 	value := 12
-	setOperation := testMatrix.Set(i,j, value)
-	if setOperation {
-		if testMatrix.data[i*testMatrix.cols+j] != value {
-			t.Errorf("[%d],[%d] element is not equal to %d", i, j, value)
+	setOperation1 := testMatrix.Set(i1,j1, value)
+	if setOperation1 {
+		if testMatrix.data[i1*testMatrix.cols+j1] != value {
+			t.Errorf("[%d],[%d] element is not equal to %d", i1, j1, value)
 		}
-	} else {
-		t.Errorf("Nothing to set")
+	}
+	setOperation2 := testMatrix.Set(i2,j2, value)
+	if (i2 < 0 || testMatrix.rows <= i2 || j2 <0 || testMatrix.cols <= j2) && setOperation2 {
+		t.Errorf("False vaule test is not passed")
 	}
 }
